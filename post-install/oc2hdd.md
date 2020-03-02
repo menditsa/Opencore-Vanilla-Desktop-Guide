@@ -1,6 +1,6 @@
 ## Moving OpenCore from USB to Hard Drive
 
-Last edited: March 03, 2020
+Last edited: March 02, 2020
 
 #### MountEFI
 
@@ -42,9 +42,13 @@ If you have any other operating system like Windows or Linux on a seperate hard 
 In the above example macOS is the drive that contains the Catalina install.
 Select option:
 **2. macOS**
-Go back to finder and click on the EFI partition.There should be no folders showing. If there is some folders there **STOP** and double check what you have mounted.
+
+Go back to finder and click on the EFI partition.
+There should be no folders showing.
+If there is some folders there **STOP** and double check what you have mounted.
 Once satisfied you have the correct partition go to your desktop and copy the EFI folder we copied over earlier.
 Now click on the EFI partition and paste the folder.
 Again click on ![](https://i.imgur.com/tF0Rp5Z.png?1) to unmount your hard drive's EFI partition.
 Remove your USB drive from the PC and reboot.
-When rebooting you need to select the drive either by boot selection or making the drive first in BIOS boot order. You need to check your board manual on how to do this.
+When rebooting you need to select the drive either by boot selection or making the drive first in BIOS boot order.
+You need to check your board manual on how to do this.
