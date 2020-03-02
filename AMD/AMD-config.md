@@ -25,7 +25,7 @@ Now with those downloaded, we can get to really get started:
 * Open your new config.plist in ProperTree
    * macOS: `ProperTree.command`
    * Windows: `ProperTree.bat`
-* Run the Clean Snapshot function(**Cmd/Ctrl + Shift + R** and point it at your EFI/OC folder), 
+* Run the Clean Snapshot function(**Cmd/Ctrl + Shift + R** and point it at your EFI/OC folder),
    * This will remove all the entries from the config.plist and then adds all your SSDTs, Kexts and Firmware drivers to the config
    * Cmd+R is another option that will add all your files as well but will leave entries disabled if they were set like that before, useful for when you're troubleshooting
 
@@ -46,7 +46,7 @@ This is where you'll add SSDTs for your system, these are very important to **bo
    * Hides the Embedded controller and creates a fake one for macOS, **needed for all Catalina users** and recommended for other versions of macOS
    * This SSDT also has a second function, USBX. This is used for forcing USB power properties and requires SSDT-EC so this just jumbles them together.
    * I've also provided a precompiled version for users with `EC0`, this is the most common device on AMD systems: [SSDT-EC-USBX-AMD.aml](https://github.com/khronokernel/Opencore-Vanilla-Desktop-Guide/blob/master/extra-files/SSDT-EC-USBX-AMD.aml)
- 
+
  Note that you **should not** add your generated `DSDT.aml` here, it is already in your firmware. So if present, remove the entry for it in your `config.plist` and under EFI/ACPI.
 
 For those wanting a deeper dive into dumping your DSDT, how to make these SSDTs, and compiling them, please see the [**Getting started with ACPI**](../extras/acpi.md) **page.** Compiled SSDTs have a **.aml** extension\(Assembled\) and will go into the `EFI/OC/ACPI` folder and **must** be specified in your config under `ACPI -> Add` as well.
@@ -59,7 +59,7 @@ This blocks certain ACPI tabes from loading, for us we can ignore this
 
 This section allows us to dynamically modify parts of the ACPI (DSDT, SSDT, etc.) via OpenCore. For us, our patches are handled by our SSDTs. This is a much cleaner solution as this will allow us to boot Windows and other OSes with OpenCore
 
-**Quirk**: 
+**Quirk**:
 
 Settings relating to ACPI, leave everything here as default.
 
@@ -97,13 +97,13 @@ Settings relating to boot.efi patching and firmware fixes, default will work for
 * **DisableVariableWrite**: NO
    * Needed for systems with non-functioning NVRAM
 * **DiscardHibernateMap**: NO
-   * Reuse original hibernate memory map, only needed for certain legacy hardware 
+   * Reuse original hibernate memory map, only needed for certain legacy hardware
 * **EnableSafeModeSlide**: YES
    * Allows for slide values to be used in Safemode
 * **EnableWriteUnprotector**: YES
    * Removes write protection from CR0 register during their execution
 * **ForceExitBootServices**: NO
-   * Ensures ExitBootServices calls succeeds even when MemoryMap has changed, don't use unless necessary 
+   * Ensures ExitBootServices calls succeeds even when MemoryMap has changed, don't use unless necessary
 * **ProtectCsmRegion**: NO
    * Needed for fixing artefacts and sleep-wake issues, AvoidRuntimeDefrag resolves this already so avoid this quirk unless necessary
 * **ProvideCustomSlide**: YES
@@ -131,15 +131,15 @@ TL;DR, delete all the PciRoot's here as we won't be using this section.
 
 **Add**: Here's where you specify which kexts to load, order matters here so make sure Lilu.kext is always first! Other higher priority kexts come after Lilu such as VirtualSMC, AppleALC, WhateverGreen, etc. A reminder that [ProperTree](https://github.com/corpnewt/ProperTree) users can run **Cmd/Ctrl + Shift + R** to add all their kexts in the correct order without manually typing each kext out.
 
-* **BundlePath** 
+* **BundlePath**
    * Name of the kext
    * ex: `Lilu.kext`
-* **Enabled** 
+* **Enabled**
    * Self-explanatory, either enables or disables the kext
-* **ExecutablePath** 
+* **ExecutablePath**
    * Path to the actual executable is hidden within the kext, you can see what path your kext has by right-clicking and selecting `Show Package Contents`. Generally, they'll be `Contents/MacOS/Kext` but some have kexts hidden within under `Plugin` folder. Do note that plist only kexts do not need this filled in.
    * ex: `Contents/MacOS/Lilu`
-* **PlistPath** 
+* **PlistPath**
    * Path to the `info.plist` hidden within the kext
    * ex: `Contents/Info.plist`
 
@@ -157,7 +157,7 @@ Kernel patches:
 * [Bulldozer/Jaguar(15h/16h)](https://github.com/khronokernel/Opencore-Vanilla-Desktop-Guide/blob/master/extra-files/15h-16h-patches.plist.zip) (10.13, 10.14, and 10.15)
 
 To merge:
-* Open both files, 
+* Open both files,
 * Delete the `Kernel -> Patch` section from config.plist
 * Copy the `Kernel -> Patch` section from patches.plist
 * Paste into where old patches were in config.plist
@@ -167,33 +167,33 @@ To merge:
 **Quirks**:
 Settings relating to the kernel, for us we'll be enabling `DummyPowerManagement`, `PanicNoKextDump`, `PowerTimeoutKernelPanic` and `XhciPortLimit`. Everything else should be left as default
 
-* **AppleCpuPmCfgLock**: NO 
+* **AppleCpuPmCfgLock**: NO
    * Only needed when CFG-Lock can't be disabled in BIOS, Clover counterpart would be AppleIntelCPUPM. AMD users can ignore
-* **AppleXcpmCfgLock**: NO 
+* **AppleXcpmCfgLock**: NO
    * Only needed when CFG-Lock can't be disabled in BIOS, Clover counterpart would be KernelPM. AMD users can ignore
-* **AppleXcpmExtraMsrs**: NO 
+* **AppleXcpmExtraMsrs**: NO
    * Disables multiple MSR access needed for unsupported CPUs like Pentiums and certain Xeons
 * **AppleXcpmForceBoost**: NO
    * Forces maximum multiplier, only recommended to enable on scientific or media calculation machines that are constantly under load. Main Xeons benifit from this
-* **CustomSMBIOSGuid**: NO 
+* **CustomSMBIOSGuid**: NO
    * Performs GUID patching for UpdateSMBIOSMode Custom mode. Usually relevant for Dell laptops. To be used in tandom with `PlatformInfo -> UpdateSMBIOSMode -> Custom`
-* **DisableIoMapper**: NO 
+* **DisableIoMapper**: NO
    * AMD doesn't have DMAR or VT-D support so irrelevant
 * **DummyPowerManagement**: YES
    * New alternative to NullCPUPowerManagement, required for all AMD CPU based systems as there's no native power management. Intel can ignore
-* **ExternalDiskIcons**: NO 
+* **ExternalDiskIcons**: NO
    * External Icons Patch, for when internal drives are treated as external drives but can also make USB drives internal. For NVMe on Z87 and below you just add built-in property via DeviceProperties.
 * **IncreasePciBarSize**: NO
    * Increases 32-bit PCI bar size in IOPCIFamily from 1 to 4 GB, enabling Above4GDecoding in the BIOS is a much cleaner and safer approach. Some X99 boards may require this, you'll generally expereince a kernel panic on IOPCIFamily if you need this
-* **LapicKernelPanic**: NO 
+* **LapicKernelPanic**: NO
    * Disables kernel panic on AP core lapic interrupt, generally needed for HP systems. Clover equivalent is `Kernel LAPIC`
-* **PanicNoKextDump**: YES 
+* **PanicNoKextDump**: YES
    * Allows for reading kernel panics logs when kernel panics occur
 * **PowerTimeoutKernelPanic**: YES
    * Helps fix kernel panics relating to power changes with Apple drivers in macOS Catalina, most notably with digital audio.
-* **ThirdPartyDrives**: NO 
+* **ThirdPartyDrives**: NO
    * Enables TRIM, not needed for NVMe but AHCI based drives may require this. Please check under system report to see if your drive supports TRIM
-* **XhciPortLimit**: YES 
+* **XhciPortLimit**: YES
    * This is actually the 15 port limit patch, don't rely on it as it's not a guaranteed solution for fixing USB. A more proper solution for AMD can be found here: [AMD USB Mapping](https://github.com/khronokernel/Opencore-Vanilla-Desktop-Guide/blob/master/AMD/AMD-USB-map.md)
 
 
@@ -209,7 +209,7 @@ Settings relating to the kernel, for us we'll be enabling `DummyPowerManagement`
 * **PollAppleHotKeys**: NO
    * Allows you to use Apple's hotkeys during boot, depending on the firmware you may need to use AppleUsbKbDxe.efi instead of OpenCore's builtin support. Do note that if you can select anything in OC's picker, disabling this option can help. Popular commands:
       * `Cmd+V`: Enables verbose
-      * `Cmd+Opt+P+R`: Cleans NVRAM 
+      * `Cmd+Opt+P+R`: Cleans NVRAM
       * `Cmd+R`: Boots Recovery partition
       * `Cmd+S`: Boot in Single-user mode
       * `Option/Alt`: Shows boot picker when `ShowPicker` set to `NO`, an alternative is `ESC` key
@@ -248,7 +248,7 @@ We'll be changing `AllowNvramReset`, `AllowSetDefault`, `RequireSignature`, `Req
    * We won't be dealing vaulting so we can ignore, **won't boot with this enabled**
 * **RequireVault**: NO
    * We won't be dealing vaulting so we can ignore as well, **won't boot with this enabled**
-* **ScanPolicy**: `0` 
+* **ScanPolicy**: `0`
    * `0` allows you to see all drives available, please refer to [Security](/post-install/security.md) section for further details. **Will not boot USBs with this set to default**
 
 **Tools** Used for running OC debugging tools like the shell, ProperTree's snapshot function will add these for you. For us, we won't be using any tools
@@ -273,7 +273,7 @@ We'll be changing `AllowNvramReset`, `AllowSetDefault`, `RequireSignature`, `Req
 
 ![NVRAM](https://i.imgur.com/rRU63NJ.png)
 
-**Add**: 
+**Add**:
 
 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14 (Booter Path, mainly used for UI Scaling)
 
@@ -291,8 +291,8 @@ We'll be changing `AllowNvramReset`, `AllowSetDefault`, `RequireSignature`, `Req
    * **npci=0x2000** - this disables some PCI debugging related to `kIOPCIConfiguratorPFM64`, alternative is `npci= 0x3000` which disables debugging related to `gIOPCITunnelledKey`. Required for when getting stuck on `PCI Start Configuration` as there are IRQ conflicts relating to your PCI lanes. **Not needed if Above4GDecoding is enabled**
    * **agdpmod=pikera** - used for disabling boardID on Navi GPUs(RX 5000 series), without this you'll get a black screen. **Don't use if you don't have Navi**
    * **alcid=1** - used for setting layout-id for AppleALC, see [supported codecs](https://github.com/acidanthera/applealc/wiki/supported-codecs) to figure out which layout to use for your specific system.
-   
-   
+
+
 * **csr-active-config**: Settings for SIP, generally recommended to manually change this within Recovery partition with `csrutil` via the recovery partition.
 
 csr-active-config is set to `00000000` which enables System Integrity Protection. You can choose a number of other options to enable/disable sections of SIP. Some common ones are as follows:
@@ -303,9 +303,9 @@ csr-active-config is set to `00000000` which enables System Integrity Protection
 
 Recommended to leave enabled for best security practices
 
-* **nvda\_drv**: &lt;&gt; 
+* **nvda\_drv**: &lt;&gt;
    * For enabling Nvidia WebDrivers, set to 31 if running a [Maxwell or Pascal GPU](https://khronokernel-3.gitbook.io/catalina-gpu-buyers-guide/). This is the same as setting nvda\_drv=1 but instead we translate it from [text to hex](https://www.browserling.com/tools/hex-to-text), Clover equivalent is `NvidiaWeb`. **AMD and Intel GPU users should leave this area blank.**
-* **prev-lang:kbd**: &lt;&gt; 
+* **prev-lang:kbd**: &lt;&gt;
    * Needed for non-Latin keyboards in the format of `lang-COUNTRY:keyboard`, recommended to keep blank though you can specify it(**Default in Sample config is Russian**):
       * American: `en-US:0`(`656e2d55533a30` in HEX)
       * Full list can be found in [AppleKeyboardLayouts.txt](https://github.com/acidanthera/OcSupportPkg/blob/master/Utilities/AppleKeyboardLayouts/AppleKeyboardLayouts.txt)
@@ -329,7 +329,7 @@ Recommended to leave enabled for best security practices
 
 ![PlatformInfo](https://i.imgur.com/CrqeCea.png)
 
-For setting up the SMBIOS info, we'll use CorpNewt's [GenSMBIOS](https://github.com/corpnewt/GenSMBIOS) application. 
+For setting up the SMBIOS info, we'll use CorpNewt's [GenSMBIOS](https://github.com/corpnewt/GenSMBIOS) application.
 
 For this example, we'll choose the iMacPro1,1 SMBIOS but some SMBIOS play with certain GPUs better than others:
 
@@ -368,7 +368,7 @@ We set Generic -&gt; ROM to either an Apple ROM \(dumped from a real Mac\), your
 
 [Apple Check Coverage page](https://checkcoverage.apple.com)
 
-**Automatic**: YES 
+**Automatic**: YES
 
 * Generates Platforminfo based on Generic section instead of DataHub, NVRAM, and SMBIOS sections
 
@@ -388,14 +388,14 @@ We set Generic -&gt; ROM to either an Apple ROM \(dumped from a real Mac\), your
 **UpdateSMBIOS**: YES
 * Updates SMBIOS fields
 
-**UpdateSMBIOSMode**: Create 
+**UpdateSMBIOSMode**: Create
 * Replace the tables with newly allocated EfiReservedMemoryType, use Custom on Dell laptops requiring CustomSMBIOSGuid quirk
 
 ## UEFI
 
 ![UEFI](https://i.imgur.com/UiGGDWK.png)
 
-**ConnectDrivers**: YES 
+**ConnectDrivers**: YES
 * Forces .efi drivers, change to NO will automatically connect added UEFI drivers. This can make booting slightly faster, but not all drivers connect themselves. E.g. certain file system drivers may not load.
 
 **Drivers**: Add your .efi drivers here
@@ -494,13 +494,9 @@ So thanks to the efforts of Ramus, we also have an amazing tool to help verify y
 
 So what in the world needs to be done once everything is installed? Well here's some things you can do:
 
-* [USB mapping](https://github.com/khronokernel/Opencore-Vanilla-Desktop-Guide/blob/master/AMD/AMD-USB-map.md) 
+* [USB mapping](https://github.com/khronokernel/Opencore-Vanilla-Desktop-Guide/blob/master/AMD/AMD-USB-map.md)
 * [Disable OpenCore logging](/troubleshooting/debug.md)
 * [Enabling FileVault and other security features](/post-install/security.md)
 * [Fixing iMessage](/post-install/iservices.md)
 * Correcting audio, reread the DeviceProperties on how
-* Moving OpenCore from the USB to your main drive
-   * Mount USB's EFI
-   * Copy EFI folder to the desktop
-   * Unmount USB and mount boot drive's EFI
-   * Paste EFI onto the root of the drive
+* [Copy OpenCore from USB to Hard Drive](/post-install/oc2hdd.md)
